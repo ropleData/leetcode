@@ -1,10 +1,11 @@
-# leetcode 算法题目解析
+# leetcode 数据库题目解析
 
 ## 题目
- [leetcode算法题目地址](https://leetcode-cn.com/problemset/algorithms/ "点击进入")
+ [leetcode数据库题目地址](https://leetcode-cn.com/problemset/database/ "点击进入")
 ## 目标
- 1. 使用C，python，java三种语言来实现leetcode上的所有算法题目
- 2. 尽可能寻找题目所对应的实际场景
+ 1. 使用sql语句实现leetcode上的所有数据库题目
+ 2. 结合实际场景优化sql
  3. 总结
-## 开始
- [leetcode地址](https://www.baidu.com "点击进入")
+## 进度
+- 0
+-[最近更新题目](https://www.baidu.com "点击进入")
