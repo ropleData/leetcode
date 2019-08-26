@@ -6,5 +6,6 @@
  1. 使用C，python，java三种语言来实现leetcode上的所有算法题目
  2. 尽可能寻找题目所对应的实际场景
  3. 总结
-## 开始
- [leetcode地址](https://www.baidu.com "点击进入")
+## 进度
+- 0
+-[最近更新题目](https://www.baidu.com "点击进入")
