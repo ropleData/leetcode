@@ -10,3 +10,6 @@
  - [算法](https://github.com/ropleData/leetcode/tree/master/Algorithms "点击进入")
  - [数据库](https://github.com/ropleData/leetcode/tree/master/Database "点击进入")
  - [多线程](https://github.com/ropleData/leetcode/tree/master/Concurrency "点击进入")
+
+## 欢迎批评指正
+ - 总结leetcode的目的是督促自己学习，欢迎大家提出各自宝贵的见解，共同进步
