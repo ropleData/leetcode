@@ -1,0 +1,40 @@
+## 思路:
+
+我们应该首先想用暴力求解的话,怎么做?
+
+我们会遍历数组a,然后看除了a数组中有没有target-a的数,这样就能保证该数组有两个数和等于target;但是时间复杂度为$O(n^2)$;
+
+接下来,想一想如何更快一点呢?
+
+对,我们可以借用哈希(python叫字典),我们遍历元素的时候,且记录元素的下标,当我们找target-a时候,只需要在字典找,就可以了,查找字典时间复杂度为$O(1)$
+
+所以,
+
+时间复杂度:$O(n)$
+
+空间复杂度:$O(n)$
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize){
+    int i,j,x,status;
+    int *index;
+    ac=(int *)malloc(sizeof(int )*2);
+    *returnSize=2;
+    for(i=0;i<numsSize;i++)
+    {
+        status=0;
+        x=target-nums[i];
+        for(j=1+i;j<numsSize;j++)
+        {
+            if(x==nums[j])   
+            { 
+                index[0]=i;
+                index[1]=j; 
+                status=1; 
+                break;
+            }
+        }
+        if(status==1) 
+            return index;
+    }
+    return index;
+}
