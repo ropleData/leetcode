@@ -8,4 +8,4 @@
  3. 总结
 ## 进度
 - 001 两数之和
-- [最近更新题目](https://www.baidu.com "点击进入")
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/001%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C.txt "点击进入")
