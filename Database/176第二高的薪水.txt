@@ -1,0 +1,86 @@
+题目：
+编写一个 SQL 查询，获取 Employee 表中第二高的薪水（Salary） 。
+
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+例如上述 Employee 表，SQL查询应该返回 200 作为第二高的薪水。如果不存在第二高的薪水，那么查询应返回 null。
+
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| 200                 |
++---------------------+
+
+
+############################################################
+思路:
+第一步：遇到这种取top的sql，首先想到的是distinct，order by，limit;
+第二步：然后考虑到题目中说如果不存在，返回null；遇到返回null，首先想到的是借助中间表，将值传递出来;
+
+############################################################
+结论：
+对top列去重，排序，limit取第二个，将其作为临时表；然后外面再套一层查询，呈现出不存在返回null的结果。
+
+
+limit和offset解析如下：
+
+1、从第1条记录开始向后选择2条
+	语句1：select * from test_tb1 limit 2 offset 1;//MySQL5.0之后支持该语法
+	语句2：select * from test_tb1 limit 1,2;
+
+2、select * from test_tb1 limit 1;//选择第0行
+相当于select * from test_tb1 limit 0,1;
+注意：行号从0开始，limit 1,1 代表第1行（从0行开始）。
+
+
+补充一些sql函数：
+1、if(true,a,b),  if(false,a,b); //这个就是第一个如果是true，就等于a，false就等于b，有点像三元表达式
+2、ifnull(null, a),ifnull(a,b);  //ifnull里有两个数，如果第一个不是null，是a非null,就都等于a， 如果a=Null，就都为a
+3、case when  then else end; //
+例如：case sex when 1 then '男' when 2 then '女' else '其他' end 
+这个就是把表中的sex字段1,换成男，2换成女，都不是换成其他,也可以写作：
+case when sex = 1 then '男' when sex = 2 then ‘女’ else '其他' end 
+前者是简单case函数，后者是case搜索函数,功能相同，但是case搜索函可以写条件判定，比如不等于，而简单case函数只能是=
+还有一点要注意的是：case函数如果满足第一个条件，就会忽略第二个条件。
+4、ISNULL(expr) 用法：如expr 为null，那么isnull() 的返回值为 1，否则返回值为 0
+5、NULLIF(expr1,expr2)用法：如果expr1 = expr2 成立，那么返回值为NULL，否则返回值为expr1。这和CASE WHEN expr1 = expr2 THEN NULL ELSE expr1 END相同。 
+
+
+
+############################################################
+sql：
+写法一：
+SELECT
+	(
+		SELECT DISTINCT
+			salary
+		FROM
+			Employee
+		ORDER BY
+			salary DESC
+		LIMIT 1,
+		1
+	) AS SecondHighestSalary;
+	
+写法二：（使用sql函数，可以增加sql可读性）
+SELECT
+	IFNULL(
+		(
+			SELECT DISTINCT
+				Salary
+			FROM
+				Employee
+			ORDER BY
+				Salary DESC
+			LIMIT 1 OFFSET 1
+		),
+		NULL
+	) AS SecondHighestSalary
+	
+        
+
