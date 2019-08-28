@@ -1,0 +1,80 @@
+题目：
+给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+
+如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+
+您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+示例：
+
+输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
+输出：7 -> 0 -> 8
+原因：342 + 465 = 807
+
+
+############################################################
+思路:
+第一步：分析题目，题目介绍的不是很清楚，我们通过对示例进行分析，会发现这是一个对两条反向单链表求和的题目;
+第二步：两数相加会涉及到求和的问题，因此我们代码中需要有个中间变量来存储进位，由于极限情况下9+9+1=19，因此这个中间变量最大为1;
+第三步：要考虑特殊情况，如果两个链表的长度不一致就需要在短链表的前驱节点补0；
+第四步：由于是从头结点开始计算的，我们最好使用一个哑节点来简化对头结点是否为空的特殊处理；
+第五步：处理完后对中间变量进行判断，如果等于1，表示要多出一个为1的节点，处理完返回next即可。
+（哑节点的概念其实和预先指针类似，该指针的下一个节点指向真正的头结点head。使用预先指针的目的在于链表初始化时无可用节点值，而且链表构造过程需要指针移动，进而会导致头指针丢失，无法返回结果）
+
+############################################################
+结论：
+将当前结点curr初始化为返回列表的哑结点，在循环外声明中间变量来保存进位值，然后下方根据思路循环进行遍历计算即可。
+如果我们用python实现的话，就可以简化思路第五步的操作，使用divmod函数返回商和余数，把商传递给中间进位变量，放到循环的条件中去，如果最后为1的话，会自动多运行一次。
+
+复杂度：
+假设第一个链表长度为m，第二个链表长度为n
+时间复杂度：O(max(m,n))
+空间复杂度：O(max(m,n))
+############################################################
+附上java和python3的实现代码：
+
+java：
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    ListNode dummyHead = new ListNode(0);
+    ListNode p = l1, q = l2, curr = dummyHead;
+    int carry = 0;
+    while (p != null || q != null) {
+        int x = (p != null) ? p.val : 0;
+        int y = (q != null) ? q.val : 0;
+        int sum = carry + x + y;
+        carry = sum / 10;
+        curr.next = new ListNode(sum % 10);
+        curr = curr.next;
+        if (p != null) p = p.next;
+        if (q != null) q = q.next;
+    }
+    if (carry > 0) {
+        curr.next = new ListNode(carry);
+    }
+    return dummyHead.next;
+    }
+}
+
+class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        dummyHead = ListNode(0)
+        curr = dummyHead
+        val = 0
+        while val or l1 or l2:
+            val, cur = divmod(val + (l1.val if l1 else 0) + (l2.val if l2 else 0), 10)
+            curr.next = ListNode(cur)
+            curr = curr.next
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
+        return dummyHead.next
+
+
