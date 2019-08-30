@@ -1,0 +1,98 @@
+题目：
+给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+
+示例 1:
+
+输入: "abcabcbb"
+输出: 3 
+解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+示例 2:
+
+输入: "bbbbb"
+输出: 1
+解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+示例 3:
+
+输入: "pwwkew"
+输出: 3
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+
+
+############################################################
+思路:
+第一步：分析题目，无重复字符的最长子串的长度;
+第二步：所要求得的最长子串应该是相邻的同时没有重复字符的，我们首先能想到的暴力解法就是求出这个字符串所有的不重复字符子串，然后选出最长的那个，但是复杂度过高;
+第三步：简化后发现，我们不用关心这个最长子串是什么，只要保留它的长度即可；
+第四步：因此我们可以使用hashset来从第一个字符开始存储为子串集合，然后和下一个进行对比，如果不在里面，长度+1,在里面就将集合数据抛弃，重新存储，重复过程，保存长度的变量要声明为2个，一个用来迭代每次集合的长度，一个用来保存最大长度。最终每次迭代结束，取最大的值返回即可；
+第五步：通过查看解析，发现上述方案也就是滑动窗口可以进行进一步的优化，优化方式为使用map存储每一个字符的值和下标，我们仅通过下标来进行计算处理，不用重复的添加和删除操作，可以将复杂度从2n降到n。
+
+
+############################################################
+结论：
+首先声明一个map用来存放字符串的每一个字符和下标，声明3个变量，一个记录下标，一个记录循环内最大长度，一个记录循环外总最大长度；
+然后每次滑动窗口扩展一个字符，就进行判断，看它是否在map里，不在的话，长度+1，在的话，，从改字符开始计算下一个滑块的长度，并与已知滑块长度对比，重复步骤。
+
+
+复杂度：
+假设第一个链表长度为m，第二个链表长度为n
+时间复杂度：O(n)
+空间复杂度：O(n)
+############################################################
+附上java,python3和C的实现代码：
+
+java：
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map<Character,Integer> map = new HashMap<>();
+        int maxTotalLength = 0;
+        int maxLengthStartIndex = 0;
+        for (int index = 0;index<s.length();index++){
+            char tmpChar = s.charAt(index);
+            if(map.containsKey(tmpChar)){
+                maxLengthStartIndex = Math.max(map.get(tmpChar),maxLengthStartIndex);
+            }
+            int reMaxLength = index - maxLengthStartIndex + 1;
+            maxTotalLength = Math.max(maxTotalLength,reMaxLength);
+            map.put(tmpChar,index + 1);
+        }
+        return maxTotalLength;
+    }
+}
+
+#值得一提的是python3把xrange变为了range，旧的range取消掉了，因此我们在python3版本可以直接使用range
+#旧版本中，由于xrange会一个一个数据返回，节省内存资源，优于range的一次性开辟全部内存空间。
+python3:
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        dict = {}
+        maxLengthStartIndex, maxTotalLength = 0, 0
+        for index in range(len(s)):
+            if s[index] in dict:
+                maxLengthStartIndex = max(dict[s[index]], maxLengthStartIndex)
+            reMaxLength = index - maxLengthStartIndex + 1
+            maxTotalLength = max(maxTotalLength, reMaxLength)
+            dict[s[index]] = index + 1
+        return maxTotalLength
+		
+C:		
+int lengthOfLongestSubstring(char * s){
+    int a[256]={0};
+    int left=0,right=1,i,max=0;
+    while(*s!='\0'){
+        i = *s;
+        if(left<a[i]){
+            left=a[i];
+        }
+        a[i]=right;
+        s++;
+        right++;
+        max=max<right-left-1?(right-left-1):max;
+    }
+    return max;
+}
+
+
+
+
+
