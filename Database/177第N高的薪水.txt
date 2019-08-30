@@ -1,0 +1,58 @@
+题目：
+编写一个 SQL 查询，获取 Employee 表中第 n 高的薪水（Salary）。
+
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+例如上述 Employee 表，n = 2 时，应返回第二高的薪水 200。如果不存在第 n 高的薪水，那么查询应返回 null。
+
++------------------------+
+| getNthHighestSalary(2) |
++------------------------+
+| 200                    |
++------------------------+
+
+
+
+############################################################
+思路:
+第一步：首先这道题相当于是把上一道题“第二高的薪水”转化为函数；
+第二步：limit的行号是从0开始的，所以第N高就是limit N-1,1；
+第三步：由于limit后面不能有-1或者N-1这样的计算出现，需要在函数前面的BEGIN处DECLARE出需要用到的变量;
+第思步：既然N是可变的，那就还要考虑到N的值是否小于1，如果小于1，逻辑不成立就要返回NULL;
+
+############################################################
+结论：
+在BEGIN里面DECLARE一个变量，等于limit后面的第一个值N-1;
+对该变量的值进行判断，小于0，不成立返回NULL；
+RETURN部分和题“第二高的薪水”一致，这里采用ISNULL函数。
+
+
+############################################################
+sql：
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+    DECLARE idx INT DEFAULT N-1;
+    IF (idx<0) THEN
+        RETURN NULL;
+    ELSE 
+    RETURN (
+        SELECT IFNULL(
+            (
+               SELECT DISTINCT Salary
+                FROM Employee
+                ORDER BY Salary DESC
+                LIMIT idx, 1
+            ), NULL
+        ) AS SecondHighestSalary   
+    );
+    END IF;
+END
+
+	
+        
+
