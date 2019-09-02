@@ -1,0 +1,100 @@
+题目：
+编写一个 SQL 查询来实现分数排名。如果两个分数相同，则两个分数排名（Rank）相同。请注意，平分后的下一个名次应该是下一个连续的整数值。换句话说，名次之间不应该有“间隔”。
+
++----+-------+
+| Id | Score |
++----+-------+
+| 1  | 3.50  |
+| 2  | 3.65  |
+| 3  | 4.00  |
+| 4  | 3.85  |
+| 5  | 4.00  |
+| 6  | 3.65  |
++----+-------+
+例如，根据上述给定的 Scores 表，你的查询应该返回（按分数从高到低排列）：
+
++-------+------+
+| Score | Rank |
++-------+------+
+| 4.00  | 1    |
+| 4.00  | 1    |
+| 3.85  | 2    |
+| 3.65  | 3    |
+| 3.65  | 3    |
+| 3.50  | 4    |
++-------+------+
+
+############################################################
+思路:
+第一步：分析本题，让按照成绩求名次；
+第二步：名次是连续的，假如所有人成绩一样，那就只有一个名次1，如果只有两种成绩，那就只有两个名次1,2；
+第三步：这里我们会首先想到在mysql中定义变量来实现自增行号，但是本题不用这么麻烦，因为这样的名次就等于求有多少成绩大于自己的成绩，假如有有50人，考取了80和90两种成绩，那由于对80分来说，只有90分大于它，那它就是第2名，符合题意;
+
+
+############################################################
+结论：
+1、将分数按降序排序：select a.Score as Score from Scores a order by Score DESC;
+2、按照思路中想到的名次获取方法：select count(distinct b.Score) from Scores b where b.Score >=a.Score
+3、将两者进行嵌套即可
+
+这里补充一下mysql中关于获取行号@rownum：=@rownum+1的用法：
+mysql中没有获取行号的函数，因此需要通过一些自定义语句来进行获取。通常做法是，通过定义用户变量@rownum来保存表中的数据。通过赋值语句@rownum：=@rownum+1来累加达到递增行号。
+
+例如：select a.* ,@rownum:=@rownum+1 from a,(select @rownum:=0) r; 后半部分语句的select @rownum:=0 相当于创建了r的新表，其表的列为@rownum，数值为0.
+
+通过利用变量将@rownum的行进行重新赋值，并显示。可以应用于获取行号或名次排列。
+
+另外，在名次排列时，由于会有重复的数据，排列时仅仅按照,@rownum:=@rownum+1。排序是不对的，需要在数据相同时，名次应该相同。因此需要另一变量保存上次的数据，并进行与本行数据对比，相同 序号不变，不同序号应该等于行号。此时需要应用到case when进行判断，例如：
+SELECT
+	a.*, CASE
+WHEN @rownum0 = a.c_id THEN
+	@rownum :=@rownum + 1
+WHEN @rownum0 := a.c_id THEN
+	@rownum := 1
+ELSE
+	@rownum
+END rank1,
+ CASE
+WHEN @rownum1 = a.s_score THEN
+	@rownum2
+WHEN @rownum1 := a.s_score THEN
+	@rownum2 :=@rownum
+ELSE
+	@rownum2
+END rank2
+FROM
+	(
+		SELECT
+			*
+		FROM
+			score
+		ORDER BY
+			c_id,
+			s_score DESC
+	) AS a,
+	(
+		SELECT
+			@rownum := 0,
+			@rownum0 := 0 ,@rownum1 := 0 ,@rownum2 := 0
+	) r;
+
+############################################################
+sql：
+SELECT
+	a.Score AS Score,
+	(
+		SELECT
+			count(DISTINCT b.Score)
+		FROM
+			Scores b
+		WHERE
+			b.Score >= a.Score
+	) AS Rank
+FROM
+	Scores a
+ORDER BY
+	Score DESC;
+	
+	
+        
+
