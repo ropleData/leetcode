@@ -95,6 +95,32 @@ FROM
 ORDER BY
 	Score DESC;
 	
+另一种自定义写法：
+SELECT
+	a.Score,
+	cast(b.Rank AS SIGNED INTEGER) AS Rank
+FROM
+	Scores a
+INNER JOIN (
+	SELECT
+		@rowNum :=@rowNum + 1 AS Rank,
+		s1.Score
+	FROM
+		(
+			SELECT
+				Score
+			FROM
+				Scores
+			GROUP BY
+				Score
+			ORDER BY
+				Score DESC
+		) s1,
+		(SELECT @rowNum := 0) aa
+) b ON a.Score = b.Score
+ORDER BY
+	a.Score DESC
+	
 	
         
 
