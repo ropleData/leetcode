@@ -7,5 +7,5 @@
  2. 结合实际场景优化sql
  3. 总结
 ## 进度
-- 178
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/178%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D.txt "点击进入")
+- 180 连续出现的数字
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/180连续出现的数字.txt  "点击进入")
