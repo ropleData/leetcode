@@ -26,7 +26,9 @@
 最长公共子串主要逻辑是根据回文子串的特性，将源字符串反转，然后寻找两个字符串的最长公共子串，不过要注意避免原字符串中非回文子串的反向副本在反转后造成的舞蹈，例如（S=“abacdfgdcaba”, S' = “abacdgfdcaba”之间的最长公共子串为 “abacd”。但是这不是回文子串），因此我们还需要判断该字符串倒置前的下标和当前的字符串下标是不是匹配（只需要判断末尾字符就可以了），时间复杂度O(n^2),空间复杂度O(n^2),我们可以对空间复杂度进行优化，优化后的空间复杂度O(n);
 
 Manacher's Algorithm 马拉车算法：
-
+马拉车算法 Manacher‘s Algorithm 是用来查找一个字符串的最长回文子串的线性方法，由一个叫 Manacher 的人在 1975 年发明的，这个方法的最大贡献是在于将时间复杂度提升到了线性。
+参考链接：
+https://leetcode-cn.com/problems/longest-palindromic-substring/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-bao-gu/
 
 
 复杂度：
@@ -131,67 +133,58 @@ public String longestPalindrome(String s) {
 }
 
 Manacher's Algorithm 马拉车算法:
-class Solution:
-    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-        n = len(nums1)
-        m = len(nums2)
+public String preProcess(String s) {
+    int n = s.length();
+    if (n == 0) {
+        return "^$";
+    }
+    String ret = "^";
+    for (int i = 0; i < n; i++)
+        ret += "#" + s.charAt(i);
+    ret += "#$";
+    return ret;
+}
 
-        if n > m:
-            return self.findMedianSortedArrays(nums2, nums1)
+// 马拉车算法
+public String longestPalindrome2(String s) {
+    String T = preProcess(s);
+    int n = T.length();
+    int[] P = new int[n];
+    int C = 0, R = 0;
+    for (int i = 1; i < n - 1; i++) {
+        int i_mirror = 2 * C - i;
+        if (R > i) {
+            P[i] = Math.min(R - i, P[i_mirror]);// 防止超出 R
+        } else {
+            P[i] = 0;// 等于 R 的情况
+        }
 
-        start_pos = 0
-        end_pos = 2 * n
+        // 碰到之前讲的三种情况时候，需要利用中心扩展法
+        while (T.charAt(i + 1 + P[i]) == T.charAt(i - 1 - P[i])) {
+            P[i]++;
+        }
 
-        while start_pos <= end_pos:
-            c1 = (start_pos + end_pos) // 2
-            c2 = m + n - c1  ##因为数组从0开始，所以c1+c2=(m+n+1)-1
+        // 判断是否需要更新 R
+        if (i + P[i] > R) {
+            C = i;
+            R = i + P[i];
+        }
 
-            LMax1 = nums1[(c1 - 1) // 2] if c1 > 0 else (-1 * sys.maxsize)
-            RMin1 = nums1[c1 // 2] if c1 < 2 * n else sys.maxsize
-            LMax2 = nums2[(c2 - 1) // 2] if c2 > 0 else (-1 * sys.maxsize)
-            RMin2 = nums2[c2 // 2] if c2 < 2 * m else sys.maxsize
+    }
 
-            if LMax1 > RMin2:
-                end_pos = c1 - 1
-            elif LMax2 > RMin1:
-                start_pos = c1 + 1
-            else:
-                break
+    // 找出 P 的最大值
+    int maxLen = 0;
+    int centerIndex = 0;
+    for (int i = 1; i < n - 1; i++) {
+        if (P[i] > maxLen) {
+            maxLen = P[i];
+            centerIndex = i;
+        }
+    }
+    int start = (centerIndex - maxLen) / 2; //最开始讲的求原字符串下标
+    return s.substring(start, start + maxLen);
+}
 
-        return (max(LMax1, LMax2) + min(RMin1, RMin2)) / 2.0
-		
-C:		
-double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-		int n = nums1.size();
-		int m = nums2.size();
-
-		if (n > m)  //保证数组1一定最短
-		{
-			return findMedianSortedArrays(nums2, nums1);
-		}
-
-		// Ci 为第i个数组的割,比如C1为2时表示第1个数组只有2个元素。LMaxi为第i个数组割后的左元素。RMini为第i个数组割后的右元素。
-		int LMax1, LMax2, RMin1, RMin2, c1, c2, lo = 0, hi = 2 * n;  //我们目前是虚拟加了'#'所以数组1是2*n长度
-
-		while (lo <= hi)   //二分
-		{
-			c1 = (lo + hi) / 2;  //c1是二分的结果
-			c2 = m + n - c1;
-
-			LMax1 = (c1 == 0) ? INT_MIN : nums1[(c1 - 1) / 2];
-			RMin1 = (c1 == 2 * n) ? INT_MAX : nums1[c1 / 2];
-			LMax2 = (c2 == 0) ? INT_MIN : nums2[(c2 - 1) / 2];
-			RMin2 = (c2 == 2 * m) ? INT_MAX : nums2[c2 / 2];
-
-			if (LMax1 > RMin2)
-				hi = c1 - 1;
-			else if (LMax2 > RMin1)
-				lo = c1 + 1;
-			else
-				break;
-		}
-		return (max(LMax1, LMax2) + min(RMin1, RMin2)) / 2.0;
-	}
 
 
 
