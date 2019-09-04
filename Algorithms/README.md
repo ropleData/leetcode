@@ -7,5 +7,5 @@
  2. 尽可能寻找题目所对应的实际场景
  3. 总结
 ## 进度
-- 005 最长回文子串
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/005最长回文子串.txt    "点击进入")
+- 006 Z字形变换
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/006Z字形变换.txt    "点击进入")
