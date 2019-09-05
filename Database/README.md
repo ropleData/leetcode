@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 181 超过经理收入的员工
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/181%E8%B6%85%E8%BF%87%E7%BB%8F%E7%90%86%E6%94%B6%E5%85%A5%E7%9A%84%E5%91%98%E5%B7%A5.txt  "点击进入")
+- 182 查找重复的电子邮箱
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/182%E6%9F%A5%E6%89%BE%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E7%AE%B1.txt  "点击进入")
