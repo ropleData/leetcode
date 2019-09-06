@@ -1,0 +1,63 @@
+题目：
+某网站包含两个表，Customers 表和 Orders 表。编写一个 SQL 查询，找出所有从不订购任何东西的客户。
+
+Customers 表：
+
++----+-------+
+| Id | Name  |
++----+-------+
+| 1  | Joe   |
+| 2  | Henry |
+| 3  | Sam   |
+| 4  | Max   |
++----+-------+
+Orders 表：
+
++----+------------+
+| Id | CustomerId |
++----+------------+
+| 1  | 3          |
+| 2  | 1          |
++----+------------+
+例如给定上述表格，你的查询应返回：
+
++-----------+
+| Customers |
++-----------+
+| Henry     |
+| Max       |
++-----------+
+
+############################################################
+思路:
+第一步：分析本题，找出从不订购任何东西的客户；
+第二步：在Orders表中不存在的客户就是题目所求，因此相当于找出Customers 表中不在Orders 表中的客户；
+第三步：有两种方案，首先最简单的是not in，不过由于mysql not in效率较慢，不建议使用；另一种是左连接，效率好一点;
+
+
+############################################################
+结论：
+1、根据Orders 表的CustomerId记录的是订购客户的Id,可以使用not in，找出Customers 表中不在Orders 表的客户名字;
+2、将两表以Customers 表为左表进行左连接，条件为Id =CustomerId，然后没有订购任何东西的客户在生成的临时表里的Id会为null，根据这个结果加以判断；
+3、左连接方案效率优于not in方案
+
+补充 not exists 优于not in:
+如果查询语句使用了not in 那么内外表都进行全表扫描，没有用到索引； 
+而not extsts 的子查询依然能用到表上的索引。 
+所以无论那个表大，用not exists都比not in要快。 
+也就是说，in和exists需要具体情况具体分析，not in和not exists就不用分析了，尽量用not exists就好了。
+
+############################################################
+
+sql：
+not in:
+select a.Name as Customers from Customers a where a.Id not in (select CustomerId from Orders);
+
+left join：
+select a.Name as Customers from Customers a left join Orders b on a.Id = b.CustomerId where b.Id is null;
+
+not exists:
+select name Customers from customers c where not exists (select 1 from orders o where o.customerid=c.id)
+	
+        
+
