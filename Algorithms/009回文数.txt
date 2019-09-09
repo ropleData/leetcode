@@ -1,0 +1,85 @@
+题目：
+判断一个整数是否是回文数。回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
+
+示例 1:
+
+输入: 121
+输出: true
+示例 2:
+
+输入: -121
+输出: false
+解释: 从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
+示例 3:
+
+输入: 10
+输出: false
+解释: 从右向左读, 为 01 。因此它不是一个回文数。
+进阶:
+
+你能不将整数转为字符串来解决这个问题吗？
+
+
+############################################################
+思路:
+第一步：分析题目，让判断给定的整数是否是回文数，回文数就是不管正序还是倒序都是一样的整数;
+第二步：首先我们能想到的方法是把整数转为Sring,然后反转并与原字符串进行比较，如果equal相等则改整数是一个回文数，不过本题进阶版不让使用转化字符串的方案；因此我们可以换一种方式，既然正反都是一样的，那就代表这个整数从第一个数开始和从最后一个数开始是相等的，因此我们可以首先判断它的长度，然后取首数字，再取尾数字，这样以此比较是否相等，一直比较到中间，得出结果，观察是否都相等，如果是否都相等即可;
+第三步：其实我们还可以换一种思路，既然是回文数，那么它从中间对折后，应该是相等的，因此我们可以取中间分割后的后半部分（如果原整数长度是奇数需要去掉中间那一位），与前半部分进行比较，如果相等就是回文数；
+第四步：在进行循环操作之前，需要对一些特殊情况进行判断，首先，如果这个整数是负数或者大于0但是末尾数字为0，那么它肯定不是回文数，因此可以直接返回false来处理
+
+
+############################################################
+结论：
+1、首先判断整数是否为负数，个位数字是否为0，如果是的话直接return false;
+2、将原整数以此循环取余，余数依次*10组成新的整数，直到新的整数大于等于不断处理后的整数，表示已经取了原整数的一半或者多一位（奇数），结束循环;
+3、如果是原整数长度是奇数的话，将新整数/10取整，然后与处理后的整数进行对比，观察是否相等（如果原整数长度是偶数可以直接进行比较）;
+4、组合即可得出结论
+
+
+
+复杂度：
+时间复杂度：O(log10(n))对于每次迭代，我们会将输入除以10，因此时间复杂度为 O(log10(n))也就是O(log n)
+空间复杂度：O(1)。保存后半部分反转的整数
+############################################################
+附上java,python3的实现代码：
+
+class Solution {
+    public boolean isPalindrome(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) return false;
+        int revertedNumber = 0;
+        while (x > revertedNumber) {
+            revertedNumber = revertedNumber * 10 + x % 10;
+            x /= 10;
+        }
+        return x == revertedNumber || x == revertedNumber / 10;
+    }
+}
+
+扩展一下转为字符串解法：
+class Solution {
+    public boolean isPalindrome(int x) {
+        String reversedStr = (new StringBuilder(x + "")).reverse().toString();
+        return (x + "").equals(reversedStr);
+    }
+}
+
+python3：
+class Solution:
+    def isPalindrome(self, x: int) -> bool:
+        if x<0 or (x!=0 and x%10==0):
+            return False 
+        revertedNumber = 0
+        while x>revertedNumber:
+            revertedNumber = revertedNumber*10 + x%10
+            x=x//10
+        return x==revertedNumber or x==revertedNumber//10;
+
+扩展一下转为字符串解法：
+class Solution:
+    def isPalindrome(self, x: int) -> bool:
+        return str(x) == str(x)[::-1] 
+
+
+
+
+
