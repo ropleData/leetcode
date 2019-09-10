@@ -1,0 +1,108 @@
+题目：
+Employee 表包含所有员工信息，每个员工有其对应的工号 Id，姓名 Name，工资 Salary 和部门编号 DepartmentId 。
+
++----+-------+--------+--------------+
+| Id | Name  | Salary | DepartmentId |
++----+-------+--------+--------------+
+| 1  | Joe   | 85000  | 1            |
+| 2  | Henry | 80000  | 2            |
+| 3  | Sam   | 60000  | 2            |
+| 4  | Max   | 90000  | 1            |
+| 5  | Janet | 69000  | 1            |
+| 6  | Randy | 85000  | 1            |
+| 7  | Will  | 70000  | 1            |
++----+-------+--------+--------------+
+Department 表包含公司所有部门的信息。
+
++----+----------+
+| Id | Name     |
++----+----------+
+| 1  | IT       |
+| 2  | Sales    |
++----+----------+
+编写一个 SQL 查询，找出每个部门获得前三高工资的所有员工。例如，根据上述给定的表，查询结果应返回：
+
++------------+----------+--------+
+| Department | Employee | Salary |
++------------+----------+--------+
+| IT         | Max      | 90000  |
+| IT         | Randy    | 85000  |
+| IT         | Joe      | 85000  |
+| IT         | Will     | 70000  |
+| Sales      | Henry    | 80000  |
+| Sales      | Sam      | 60000  |
++------------+----------+--------+
+解释：
+IT 部门中，Max 获得了最高的工资，Randy 和 Joe 都拿到了第二高的工资，Will 的工资排第三。销售部门（Sales）只有两名员工，Henry 的工资最高，Sam 的工资排第二。
+
+############################################################
+思路:
+第一步：分析本题，和上一题类似，不过上一题是求出每个部门最高薪资，这里是每个部分前三高的薪资，输出他们的信息；
+第二步：方法类似，首先我们通过子查询方式找到前三高的工资和员工名字，这里前三高反过来就相当于同部门人中超过他们薪资的薪资不会高于3，注意这里的薪资是去重后的；
+第三步：然后根据Employee的DepartmentId和Department的Id对两表两表连接后的笛卡尔积表中，查找这些的员工的部门名字，输出即可;
+
+
+############################################################
+结论：
+1、将问题分开，先求出各部门薪水前三高的员工信息;
+SELECT
+	a. NAME AS Employee,
+	a.Salary
+FROM
+	Employee a
+WHERE
+	3 > (
+		SELECT
+			count(DISTINCT b.Salary)
+		FROM
+			Employee b
+		WHERE
+			b.Salary > a.Salary
+		AND a.DepartmentId = b.DepartmentId
+	)
+2、将a表关联Department表，输出对应的部门名称，这里严格意义来看可以最后将输出结果按薪水进行降序排序，不过本题不排序也能通过；
+3、组合输出即可
+
+in可以多个字段in或者not in，进行匹配
+
+############################################################
+SELECT
+	c. NAME AS Department,
+	a. NAME AS Employee,
+	a.Salary
+FROM
+	Employee a
+JOIN Department c ON a.DepartmentId = c.Id
+WHERE
+	3 > (
+		SELECT
+			count(DISTINCT b.Salary)
+		FROM
+			Employee b
+		WHERE
+			b.Salary > a.Salary
+		AND a.DepartmentId = b.DepartmentId
+	)
+	
+另一种写法：自定义编号
+SELECT dep.Name Department, emp.Name Employee, emp.Salary
+FROM (## 自定义变量RANK, 查找出 每个部门工资前三的排名
+        SELECT te.DepartmentId, te.Salary,
+               CASE 
+                    WHEN @pre = DepartmentId THEN @rank:= @rank + 1
+                    WHEN @pre := DepartmentId THEN @rank:= 1
+               END AS RANK
+        FROM (SELECT @pre:=null, @rank:=0)tt,
+             (## (部门,薪水)去重,根据 部门(升),薪水(降) 排序
+                 SELECT DepartmentId,Salary
+                 FROM Employee
+                 GROUP BY DepartmentId,Salary
+                 ORDER BY DepartmentId,Salary DESC
+             )te
+       )t
+INNER JOIN Department dep ON t.DepartmentId = dep.Id
+INNER JOIN Employee emp ON t.DepartmentId = emp.DepartmentId and t.Salary = emp.Salary and t.RANK <= 3
+ORDER BY t.DepartmentId, t.Salary DESC ## t 结果集已有序,根据该集合排序
+	
+        
+
