@@ -1,0 +1,88 @@
+题目：
+编写一个 SQL 查询，来删除 Person 表中所有重复的电子邮箱，重复的邮箱里只保留 Id 最小 的那个。
+
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
+| 3  | john@example.com |
++----+------------------+
+Id 是这个表的主键。
+例如，在运行你的查询语句之后，上面的 Person 表应返回以下几行:
+
++----+------------------+
+| Id | Email            |
++----+------------------+
+| 1  | john@example.com |
+| 2  | bob@example.com  |
++----+------------------+
+
+
+
+############################################################
+思路:
+第一步：分析本题，让删除重复的电子邮箱，同时只保留Id最小的那个；
+第二步：首先最直观的思路，连查Person表两，连接条件是p1.Email = p2.Email AND p1.Id > p2.Id，输出p1表的数据，此时输出的都是重复且Id值非最小的数据，然后根据delete语法删除掉即可；
+第三步：另一个思路，我们反着去思考，删除重复Id非最小的邮箱，就等于删除所有数据，后面加上Id 不为最小的条件，也就是说我们只需要找到所有的Email的最小Id，然后删除的时候not in 即可;
+
+
+############################################################
+结论：
+第一种思路：
+1、首先将表和自身进行连接;
+SELECT p1.*
+FROM Person p1,
+    Person p2
+WHERE
+    p1.Email = p2.Email
+2、根据Id关系，输出所有重复邮箱中Id非最小的数据；
+SELECT p1.*
+FROM Person p1,
+    Person p2
+WHERE
+    p1.Email = p2.Email AND p1.Id > p2.Id
+3、按照delete语法，将查询改为delete即可，当然也可以查询出Id,然后delete中套用子查询实现，不过没必要多此一举；
+注意：delete如果用了表别名，delete后要加别名指定删除查出的哪个结果，比如这里我们删除p1.*中的数据，这里就要delete p1才行：
+DELETE p1 FROM Person p1,
+    Person p2
+WHERE
+    p1.Email = p2.Email AND p1.Id > p2.Id
+
+第二种思路：
+1、首先查找所有邮箱最小的Id;
+SELECT MIN(Id) AS Id 
+FROM Person
+GROUP BY Email
+2、从Person表中删除Id不在上述Id范围内的数据即可；
+注意：因为对于SQL里delete这个操作而言，要求where条件里不能有删除的那个表；
+就是删除Person表时person表不能出现在where条件里 防止出现递归删除或死循环 所以需要在外面套一层临时表temp解决这个问题
+DELETE FROM Person
+WHERE Id NOT IN (   
+    SELECT id FROM
+   (
+       SELECT MIN(Id) AS Id 
+       FROM Person
+       GROUP BY Email
+   ) AS temp    -- 此处需使用临时表，否则会发生报错
+)
+
+############################################################
+方法1:
+DELETE p1 FROM Person p1,
+    Person p2
+WHERE
+    p1.Email = p2.Email AND p1.Id > p2.Id
+
+方法2：
+DELETE FROM Person
+WHERE Id NOT IN (   
+    SELECT id FROM
+   (
+       SELECT MIN(Id) AS Id 
+       FROM Person
+       GROUP BY Email
+   ) AS temp    
+)
+        
+
