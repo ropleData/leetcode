@@ -1,0 +1,73 @@
+题目：
+给定 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0)。找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+说明：你不能倾斜容器，且 n 的值至少为 2。
+
+
+示例:
+
+输入: [1,8,6,2,5,4,8,3,7]
+输出: 49
+
+
+############################################################
+思路:
+第一步：分析题目，给定一个整数数组，里面的每个数都可以看成桶边的长度，这些数的间隔是桶的宽度，让求它们所围成的最大面积;
+第二步：首先我们分析长度，既然是水，那么它的最大长度取决于组成它的两条边中最短的那个，比如1,8两个组成桶的边长的话，那能容纳的水的长度最多是1，因此求面积这里会有一次取最小值步骤;
+第三步：然后我们分析宽度，宽度取决于间隔，也就是数组中每个整数的下标间隔，比如1，8组成容器的话，长度为1，宽度也为1，面积就是1*1等于1；
+第四步：题目逻辑分析清楚了，那么我们能想到的最简单的暴力解法就是求出这个数组能组成的所有容器，然后比较面积，取最大值；
+第五步：暴力解法完成后，我们要考虑怎么去优化，由于本题是容器装水，那么我们可以假定选择初始数组中两个整数构成的容器为最大值，然后这里会有一个规律，如果我们想获取比这个容器更大的面积，那我们需要优先移动较短的一边，如此遍历一遍数组就可以求出最大面积。这种方法叫做双指针法，从数组的任意位置给出两个下标开始变化都可以，这里我们可以指向第一个和最后一个下标
+
+############################################################
+结论：
+1、使用双指针法，首先定义两个下标，分别是数组的开头和结尾；
+2、求出构成的面积，然后判断两个下标指向的整数的大小，由于我们此时的宽的是最大的，不管移动哪一个，容器的宽度都将减小，如果想要获取更大的面积，更有可能的操作是移动两者较小的一边，向较大的一边去靠拢;
+3、最终当两条边下标相邻后，就是最后一个比较的容器，此时就能得出最大容器容纳水的面积
+
+
+时间复杂度：O(n)
+空间复杂度：O(1)
+############################################################
+附上java,python3的实现代码：
+
+暴力解法：
+java：
+    class Solution{
+        public int maxArea(int[] height) {
+            int maxNum = 0;
+            for (int i = 0; i < height.length; i++) {
+                for (int j = i + 1; j < height.length; j++) {
+                    int lengthNum = Math.min(height[i], height[j]);
+                    maxNum = Math.max(maxNum, lengthNum * (j - i));
+                }
+            }
+            return maxNum;
+        }
+    }
+双指针法：
+java：
+    class Solution{
+        public int maxArea(int[] height) {
+            int maxNum = 0,lengthNum = 0,start = 0,end = height.length - 1;
+            while (start < end) {
+                maxNum = Math.max(maxNum, Math.min(height[start], height[end]) * (end - start));
+                if (height[start] <= height[end]) {
+                    start++;
+                } else {
+                    end--;
+                }
+            }
+            return maxNum;
+        }
+    }
+python3：
+class Solution:
+    def maxArea(self, height: List[int]) -> int:
+        start, end, maxNum = 0, len(height) - 1, 0
+        while start < end:
+			maxNum = max(maxNum, min(height[start],height[end]) * (end - start))
+            if height[start] < height[end]:
+                start += 1
+            else:
+                end -= 1
+        return maxNum
