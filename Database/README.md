@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 196 删除重复的电子邮箱
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/196%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E7%AE%B1.txt  "点击进入")
+- 197 上升的温度
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/197%E4%B8%8A%E5%8D%87%E7%9A%84%E6%B8%A9%E5%BA%A6.txt  "点击进入")
