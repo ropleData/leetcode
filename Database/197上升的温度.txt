@@ -1,0 +1,74 @@
+题目：
+给定一个 Weather 表，编写一个 SQL 查询，来查找与之前（昨天的）日期相比温度更高的所有日期的 Id。
+
++---------+------------------+------------------+
+| Id(INT) | RecordDate(DATE) | Temperature(INT) |
++---------+------------------+------------------+
+|       1 |       2015-01-01 |               10 |
+|       2 |       2015-01-02 |               25 |
+|       3 |       2015-01-03 |               20 |
+|       4 |       2015-01-04 |               30 |
++---------+------------------+------------------+
+例如，根据上述给定的 Weather 表格，返回如下 Id:
+
++----+
+| Id |
++----+
+|  2 |
+|  4 |
++----+
+
+############################################################
+思路:
+第一步：分析本题，查找出比昨天温度高的日期Id；
+第二步：思路很简单，可以根据相邻的RecordDate差为1的规律，和Temperature值的大小，来筛选数据；
+第三步：不管是用join还是from都可以，Weather表和自身做笛卡尔积，然后再筛选即可;
+
+
+############################################################
+结论：
+第一种思路：
+1、首先将表和自身进行连接;
+select a.Id as Id from Weather a ,Weather b
+2、根据RecordDate关系和Temperature大小关系添加where条件，筛选数据
+SELECT
+	a.Id AS Id
+FROM
+	Weather a,
+	Weather b
+WHERE
+	DATEDIFF(a.RecordDate, b.RecordDate) = 1
+AND a.Temperature > b.Temperature
+
+第二种思路：
+1、首先使用join将表和自身连接;
+2、在on中假如筛选条件，筛选数据
+
+补充：
+	DATEDIFF用法：
+		DATEDIFF 函数，可以计算两者的日期差
+		DATEDIFF('2007-12-31','2007-12-30');   # 1
+		DATEDIFF('2010-12-30','2010-12-31');   # -1
+
+
+############################################################
+方法1:
+SELECT
+	a.Id AS Id
+FROM
+	Weather a,
+	Weather b
+WHERE
+	DATEDIFF(a.RecordDate, b.RecordDate) = 1
+AND a.Temperature > b.Temperature
+
+方法2：
+SELECT
+    a.id AS Id
+FROM
+    weather a
+        JOIN
+    weather b ON DATEDIFF(a.RecordDate, b.RecordDate) = 1
+        AND a.Temperature > b.Temperature
+        
+
