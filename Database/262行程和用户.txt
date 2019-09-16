@@ -1,0 +1,122 @@
+题目：
+Trips 表中存所有出租车的行程信息。每段行程有唯一键 Id，Client_Id 和 Driver_Id 是 Users 表中 Users_Id 的外键。Status 是枚举类型，枚举成员为 (‘completed’, ‘cancelled_by_driver’, ‘cancelled_by_client’)。
+
++----+-----------+-----------+---------+--------------------+----------+
+| Id | Client_Id | Driver_Id | City_Id |        Status      |Request_at|
++----+-----------+-----------+---------+--------------------+----------+
+| 1  |     1     |    10     |    1    |     completed      |2013-10-01|
+| 2  |     2     |    11     |    1    | cancelled_by_driver|2013-10-01|
+| 3  |     3     |    12     |    6    |     completed      |2013-10-01|
+| 4  |     4     |    13     |    6    | cancelled_by_client|2013-10-01|
+| 5  |     1     |    10     |    1    |     completed      |2013-10-02|
+| 6  |     2     |    11     |    6    |     completed      |2013-10-02|
+| 7  |     3     |    12     |    6    |     completed      |2013-10-02|
+| 8  |     2     |    12     |    12   |     completed      |2013-10-03|
+| 9  |     3     |    10     |    12   |     completed      |2013-10-03| 
+| 10 |     4     |    13     |    12   | cancelled_by_driver|2013-10-03|
++----+-----------+-----------+---------+--------------------+----------+
+Users 表存所有用户。每个用户有唯一键 Users_Id。Banned 表示这个用户是否被禁止，Role 则是一个表示（‘client’, ‘driver’, ‘partner’）的枚举类型。
+
++----------+--------+--------+
+| Users_Id | Banned |  Role  |
++----------+--------+--------+
+|    1     |   No   | client |
+|    2     |   Yes  | client |
+|    3     |   No   | client |
+|    4     |   No   | client |
+|    10    |   No   | driver |
+|    11    |   No   | driver |
+|    12    |   No   | driver |
+|    13    |   No   | driver |
++----------+--------+--------+
+写一段 SQL 语句查出 2013年10月1日 至 2013年10月3日 期间非禁止用户的取消率。基于上表，你的 SQL 语句应返回如下结果，取消率（Cancellation Rate）保留两位小数。
+
++------------+-------------------+
+|     Day    | Cancellation Rate |
++------------+-------------------+
+| 2013-10-01 |       0.33        |
+| 2013-10-02 |       0.00        |
+| 2013-10-03 |       0.50        |
++------------+-------------------+
+
+############################################################
+思路:
+第一步：分析本题，让求得非禁止用户在指定日期区间的取消率，逻辑有点绕，我们一点点来解决；
+第二步：首先最难得地方应该是求出非禁止用户，我们可以先求出被禁止的用户，然后在trips表中去除这部分用户，由于Client_Id和Driver_Id不相同且在同一列，因此这里关联Users表时要分别连接两次才能得出正确的数据；
+第三步：非禁止用户拿到后，根据Status来判断是否是用户（用户包括乘客和司机）取消的，使用round函数把两个sum相除的结果保留两位小数即可
+
+
+############################################################
+结论：
+1、行程表Trips中，字段client_id和driver_id，都与用户表中的users_id关联。因此只要client_id和driver_id中有一个被禁止了，此条行程记录要被剔除。
+2、由于sql数据是一条条返回的，而且这里Client_Id和Driver_Id不相同，且在同一行返回因此要进行分别内连接关联比较：
+	SELECT *
+	FROM Trips AS T
+	JOIN Users AS U1 ON (T.client_id = U1.users_id AND U1.banned ='No')
+	JOIN Users AS U2 ON (T.driver_id = U2.users_id AND U2.banned ='No')
+	下面是错误做法：
+	SELECT *
+	FROM Trips AS T JOIN Users AS U 
+	ON (T.client_id = U.users_id  OR T.driver_id = U.users_id )  AND U.banned ='No'
+	解释：
+	我们拿Trips表中Id为2的行程数据举例，这里T.client_id为2是被禁止的，但是T.driver_id为11没有被禁止，因此在or的情况下，返回结果依然为true，这条数据依然不会被剔除，因此这种写法错误
+3、每组的总行程数：COUNT(T.STATUS)，每组的取消的行程数：
+	SUM(
+		IF(T.STATUS = 'completed',0,1)
+	)
+4、取消率 = 每组的取消的行程数 / 每组的总行程数：
+	ROUND(
+				SUM(
+					IF(T.STATUS = 'completed',0,1)
+				)
+				/ 
+				COUNT(T.STATUS),
+				2
+		) AS `Cancellation Rate`
+5、组合所有核心步骤，最后根据日期过滤然后根据日期分组就可以得出所求的sql
+
+
+补充：
+	ROUND() 函数
+		ROUND() 函数用于把数值字段舍入为指定的小数位数；
+			ROUND(X)： 返回参数X的四舍五入的一个整数。
+				mysql> select ROUND(-1.23);
+					-> -1
+				mysql> select ROUND(-1.58);
+					-> -2
+				mysql> select ROUND(1.58);
+					-> 2
+				
+			ROUND(X,D)： 返回参数X的四舍五入的有 D 位小数的一个数字。如果D为0，结果将没有小数点或小数部分。
+				mysql> select ROUND(1.298, 1);
+					-> 1.3
+				mysql> select ROUND(1.298, 0);
+					-> 1
+			注意：ROUND 返回值被变换为一个BIGINT!
+	IF() 函数
+		IF(expr,v1,v2)	如果表达式 expr 成立，返回结果 v1；否则，返回结果 v2。	
+			mysql> SELECT IF(1 > 0,'正确','错误')    
+				-> 正确
+			在mysql中if()函数的用法类似于java中的三目表达式；
+			也经常用于判断的关联条件中：
+			https://www.cnblogs.com/zjdxr-up/p/8383609.html
+		
+
+
+############################################################
+SELECT T.request_at AS `Day`, 
+	ROUND(
+			SUM(
+				IF(T.STATUS = 'completed',0,1)
+			)
+			/ 
+			COUNT(T.STATUS),
+			2
+	) AS `Cancellation Rate`
+FROM Trips AS T
+JOIN Users AS U1 ON (T.client_id = U1.users_id AND U1.banned ='No')
+JOIN Users AS U2 ON (T.driver_id = U2.users_id AND U2.banned ='No')
+WHERE T.request_at BETWEEN '2013-10-01' AND '2013-10-03'
+GROUP BY T.request_at
+        
+
