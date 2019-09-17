@@ -1,0 +1,120 @@
+题目：
+罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+
+示例 1:
+
+输入: ["flower","flow","flight"]
+输出: "fl"
+示例 2:
+
+输入: ["dog","racecar","car"]
+输出: ""
+解释: 输入不存在公共前缀。
+说明:
+
+所有输入只包含小写字母 a-z 。
+
+############################################################
+思路:
+第一步：分析题目，让求字符串数组中字符串的最长公共前缀;
+第二步：既然是公共前缀，那我们首先想到的是java的a.indexof(b)方法判断b是否是a的子串，是的话返回首先出现的下标，那这里如果我们用这个方法的话，公共前缀应该返回0才对，返回-1代表不是子串，那就更不是前缀了。沿着这一条思路，我们可以假设第一个字符串为最长公共前缀prefix，然后和下一个进行indexof，如果返回0，就直接返回就可以了，如果不为0，就去掉prefix的末尾字符，循环进行比较，直到返回0即可，如果最后prefix字符去掉完了，依然返回0，就表示这两个字符串没有公共前缀，那就可以直接返回""，因为题目是让求所有字符串的最长公共前缀，如果两个字符串没有公共前缀，那就说明它们的最长公共前缀就是"",这种方法称为水平扫描法；
+第四步：我们可以对水平扫描法进行优化，因为如果存在最长公共前缀，那么所有字符串中它的长度一定小于等于最短的那个字符串，我们可以取字符串对比时只取最短长度的一半，判断是否是公共子串，是的话在末尾扩展一位长度，不是的话减少一位长度，如此循环直到找到结果或者最短字符串遍历完，这种方法是二分查找法
+
+############################################################
+结论：
+第一种方法：水平扫描法比较易于理解，就是假设第一个字符串为最大公共前缀，然后根据indexof方法，逐个遍历剩余的字符串，直到返回0即可，不为0就减小末尾一位字符，循环得出结果；
+第二种方法：二分查找法，首先要遍历数组所有字符串的长度，找到最短的长度，然后从最短长度的一半开始遍历查找，得出结果
+
+水平扫描法:
+	时间复杂度：O(S*log(n)) S 是所有字符串中字符数量的总和。最坏的情况下，n个字符串都是相同的。算法会将 S1与其他字符串 [S2.... Sn]都做一次比较。这样就会进行 S次字符比较，其中 S是输入数据中所有字符数量。
+	空间复杂度：O(1) 常数级别的额外空间。
+二分查找法:
+	时间复杂度：O(S*log(n)) 其中S是所有字符串中字符数量的总和，算法一共会进行 log(n) 次迭代，每次一都会进行 S = m*n次比较，所以总时间复杂度为 O(S * log(n))。
+	空间复杂度：O(1) 常数级别的额外空间。
+############################################################
+附上java,python3的实现代码：
+java方法1：
+class Solution {
+	public String longestCommonPrefix(String[] strs) {
+	   if (strs.length == 0) return "";
+	   String prefix = strs[0];
+	   for (int i = 1; i < strs.length; i++)
+		   while (strs[i].indexOf(prefix) != 0) {
+			   prefix = prefix.substring(0, prefix.length() - 1);
+			   if (prefix.isEmpty()) return "";
+		   }        
+	   return prefix;
+	}
+
+}
+java方法2：
+class Solution {
+	   public String longestCommonPrefix(String[] strs) {
+		if (strs == null || strs.length == 0)
+			return "";
+		int minLen = Integer.MAX_VALUE;
+		for (String str : strs)
+			minLen = Math.min(minLen, str.length());
+		int low = 1;
+		int high = minLen;
+		while (low <= high) {
+			int middle = (low + high) / 2;
+			if (isCommonPrefix(strs, middle))
+				low = middle + 1;
+			else
+				high = middle - 1;
+		}
+		return strs[0].substring(0, (low + high) / 2);
+	}
+
+	private boolean isCommonPrefix(String[] strs, int len){
+		String str1 = strs[0].substring(0,len);
+		for (int i = 1; i < strs.length; i++)
+			if (!strs[i].startsWith(str1))
+				return false;
+		return true;
+	}
+}
+
+python方法1：
+class Solution(object):
+    def longestCommonPrefix(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: str
+        """
+        if len(strs) == 0:
+            return ""
+        prefix = strs[0]  # 从第1个字符串开始
+        for i in range(len(strs)):
+            while(strs[i].find(prefix) != 0):  # 不是其他字符串的前缀
+                prefix = prefix[0: len(prefix)-1]  # 减少前缀
+                if not prefix:
+                    return ""
+        return prefix
+补充学到的两种方法：
+1、利用python的max()和min()，在Python里字符串是可以比较的，按照ascII值排，举例abb， aba，abac，最大为abb，最小为aba。所以只需要比较最大最小的公共前缀就是整个数组的公共前缀
+	class Solution(object):
+		def longestCommonPrefix(self, strs):
+			if not strs: return ""
+			s1 = min(strs)
+			s2 = max(strs)
+			for i,x in enumerate(s1):
+				if x != s2[i]:
+					return s2[:i]
+			return s1
+2、利用python的zip函数，把str看成list然后把输入看成二维数组，左对齐纵向压缩，然后把每项利用集合去重，之后遍历list中找到元素长度大于1之前的就是公共前缀
+	class Solution(object):
+		def longestCommonPrefix(self, strs):
+			if not strs: return ""
+			ss = list(map(set, zip(*strs)))
+			res = ""
+			for i, x in enumerate(ss):
+				x = list(x)
+				if len(x) > 1:
+					break
+				res = res + x[0]
+			return res
