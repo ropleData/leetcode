@@ -1,0 +1,98 @@
+题目：
+Table: Activity
+
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| player_id    | int     |
+| device_id    | int     |
+| event_date   | date    |
+| games_played | int     |
++--------------+---------+
+(player_id, event_date) is the primary key of this table.
+This table shows the activity of players of some game.
+Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
+ 
+
+Write a SQL query that reports the device that is first logged in for each player.
+
+The query result format is in the following example:
+
+Activity table:
++-----------+-----------+------------+--------------+
+| player_id | device_id | event_date | games_played |
++-----------+-----------+------------+--------------+
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-05-02 | 6            |
+| 2         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
++-----------+-----------+------------+--------------+
+
+Result table:
++-----------+-----------+
+| player_id | device_id |
++-----------+-----------+
+| 1         | 2         |
+| 2         | 3         |
+| 3         | 1         |
++-----------+-----------+
+
+############################################################
+思路:
+第一步：分析本题，会发现本题是上一题的升级版本，需要拿到每位玩家首次登录平台使用的设备Id；
+第二步：最简单直观的方法我们可以使用in + 子查询，首先查出player_id和首次登录的event_date，然后外层查询出player_id，device_id，过滤条件为player_id，event_date in 子查询结果；
+第三步：换一种方法，我们还可以把子查询作为临时表，然后将Activity与其内连接，在on中关联两者的player_id，event_date相等，这样就可以只取两者交集，找出题目所求
+
+############################################################
+结论：
+第一种方法：
+1、首先使用min函数和group by找到所有玩家初次在平台使用设备玩游戏的时间（类似上一题）
+	select player_id,min(event_date) as first_login from Activity group by player_id
+2、将步骤1的结果作为子查询，外层再套用一层，查找player_id和device_id即可
+	select a.player_id ,a.device_id from Activity a where (a.player_id ,a.event_date) in 
+	(select player_id,min(event_date) as first_login from Activity group by player_id)
+	
+第二种方法：
+1、同方法1，首先将子查询作为临时表
+	(select player_id,min(event_date) as first_login from Activity group by player_id) AS b
+2、内连接Activity和临时表b，同时查出player_id,device_id：
+	SELECT a.player_id,a.device_id FROM Activity a INNER JOIN (select player_id,min(event_date) as first_login from Activity group by player_id) AS b 
+	on a.event_date = b.first_login AND a.player_id = b.player_id;
+
+############################################################
+
+方法1：
+SELECT
+	a.player_id,
+	a.device_id
+FROM
+	Activity a
+WHERE
+	(a.player_id, a.event_date) IN (
+		SELECT
+			player_id,
+			min(event_date) AS first_login
+		FROM
+			Activity
+		GROUP BY
+			player_id
+	)
+方法2：
+SELECT
+	a.player_id,
+	a.device_id
+FROM
+	Activity a
+INNER JOIN (
+	SELECT
+		player_id,
+		min(event_date) AS first_login
+	FROM
+		Activity
+	GROUP BY
+		player_id
+) AS b ON a.event_date = b.first_login
+AND a.player_id = b.player_id;
+        
+
