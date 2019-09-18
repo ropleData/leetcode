@@ -1,0 +1,82 @@
+题目：
+活动表 Activity：
+
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| player_id    | int     |
+| device_id    | int     |
+| event_date   | date    |
+| games_played | int     |
++--------------+---------+
+表的主键是 (player_id, event_date)。
+这张表展示了一些游戏玩家在游戏平台上的行为活动。
+每行数据记录了一名玩家在退出平台之前，当天使用同一台设备登录平台后打开的游戏的数目（可能是 0 个）。
+ 
+
+写一条 SQL 查询语句获取每位玩家 第一次登陆平台的日期。
+
+查询结果的格式如下所示：
+
+Activity 表：
++-----------+-----------+------------+--------------+
+| player_id | device_id | event_date | games_played |
++-----------+-----------+------------+--------------+
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-05-02 | 6            |
+| 2         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
++-----------+-----------+------------+--------------+
+
+Result 表：
++-----------+-------------+
+| player_id | first_login |
++-----------+-------------+
+| 1         | 2016-03-01  |
+| 2         | 2017-06-25  |
+| 3         | 2016-03-02  |
++-----------+-------------+
+
+############################################################
+思路:
+第一步：分析本题，会发现给出的玩家退出平台时打开的游戏数目和设备Id是没有用的，只是让求每位玩家第一次登录的时间；
+第二步：这里我们可以根据玩家player_id分组，然后使用min函数求得最小的登陆平台的日期event_date，然后就可以得出结果了；
+
+
+############################################################
+结论：
+1、首先将Activity按照player_id分组：
+	select player_id,event_date as first_login from Activity group by player_id
+2、然后使用min函数求得最小的event_date：
+	min(event_date) as first_login
+3、组合以上步骤即可得出完整sql
+
+
+
+补充：
+	order by + 数字
+	group by + 数字
+		mysql官方文档如下: 
+			select_expr [, select_expr …] [FROM table_references 
+			[WHERE where_condition] 
+			[GROUP BY {col_name | expr | position} [ASC | DESC], … [WITH ROLLUP]] [HAVING where_condition] 
+			[ORDER BY {col_name | expr | position} [ASC | DESC], …]
+
+			order语句中position与col_name是替代关系,它代表select后边的参数位置. 
+			group语句中position的含义相同
+
+
+			实例：
+				SELECT a, b FROM t
+				GROUP BY 2
+				ORDER BY 2
+				语句中的两个2都表示b字段	
+
+############################################################
+
+select player_id,min(event_date) as first_login from Activity group by player_id 
+或者：
+select player_id,min(event_date) as first_login from Activity group by 1
+        
+
