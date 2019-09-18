@@ -1,0 +1,89 @@
+题目：
+给定一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？找出所有满足条件且不重复的三元组。
+
+注意：答案中不可以包含重复的三元组。
+
+例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+
+满足要求的三元组集合为：
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+
+############################################################
+思路:
+第一步：分析题目，本题是两数求和的升级版，让求出给定数组中三个数之和为0的所有组合，同时结果不可重复;
+第二步：首先，我们可以和两个数求和那样先使用暴力法，遍历三次数组，分别求出所有的三数之和，然后找出满足和为0的组合，不过复杂度过高O(n^3)；
+第三步：如果要对暴力法进行优化，首先想到的就是双指针法，具体过程是：首先将给定的数组排序，复杂度为 O(NlogN)，然后拿到第一个数，也就是最小的数k,然后两个指针i，j分别指向k的后面和数组最后一位数，然后循环求得k和i，j指向数字的和。如果和大于0说明j指向的过大了，将j左移；如果和小于0说明i指向的数过小了，将i右移；如果为0记录符合要求的三个数，然后同时移动i和j，因为还有可能有别的组合满足条件；不管结果等于多少，当i和j移动到同一位置，即下标相等时就结束本次循环，可以将k移动到下一个数，然后i，j初始化为k的下一位和最后一位，重新进行计算和移动了；
+第四步：在计算的过程中我们要考虑到一些特殊情况，以节省运行时间和去除重复三元组，比如，当k的值>0时，那么直接就可以break跳出所有循环了，因为当最小数>0时，显然三数之和不可能为0；当第一轮循环结束，也就是k的下标大于0时，如果此时的k等于之前的k，那么直接跳过这个k，开始下一个k即可，因为之前已经计算过这个值的所有情况了，如果重复考虑不禁会增加计算量，还可能输出重复数据；同时在i和j移动的过程中也是一样的道理，如果遇到和移动前相等的数，也需要直接跳过，来避免遇到重复数据和优化计算量
+
+############################################################
+结论：
+1、双指针法的前提是数组要是有序的，因此我们首先给数组nums排序，复杂度为 O(NlogN)；
+2、固定3个指针，最左（最小）数字的指针 k，双指针 i，j 分设在数组索引 (k, len(nums))两端，通过双指针交替向中间移动：
+3、当 nums[k] > 0 时直接break跳出：因为 nums[j] >= nums[i] >= nums[k] > 0，即 33 个数字都大于 00 ，在此固定指针 k 之后不可能再找到结果了；
+4、当 k > 0且nums[k] == nums[k - 1]时即跳过此元素nums[k]：因为已经将 nums[k - 1] 的所有组合加入到结果中，本次双指针搜索只会得到重复组合；
+5、i，j 分设在数组索引 (k, len(nums)) 两端，当i < j时循环计算s = nums[k] + nums[i] + nums[j]，并按照以下规则执行双指针移动：
+	当s < 0时，i += 1并跳过所有重复的nums[i]；
+	当s > 0时，j -= 1并跳过所有重复的nums[j]；
+	当s == 0时，记录组合[k, i, j]至res，执行i += 1和j -= 1并跳过所有重复的nums[i]和nums[j]，防止记录到重复组合
+
+	
+复杂度分析：
+时间复杂度 O(N^2))：其中固定指针k循环复杂度 O(N)，双指针 i，j 复杂度 O(N)
+空间复杂度 O(1)：指针使用常数大小的额外空间
+
+
+############################################################
+附上java,python3的实现代码：
+java方法：
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        for(int k = 0; k < nums.length - 2; k++){
+            if(nums[k] > 0) break;
+            if(k > 0 && nums[k] == nums[k - 1]) continue;
+            int i = k + 1, j = nums.length - 1;
+            while(i < j){
+                int sum = nums[k] + nums[i] + nums[j];
+                if(sum < 0){
+                    while(i < j && nums[i] == nums[++i]);
+                } else if (sum > 0) {
+                    while(i < j && nums[j] == nums[--j]);
+                } else {
+                    res.add(new ArrayList<Integer>(Arrays.asList(nums[k], nums[i], nums[j])));
+                    while(i < j && nums[i] == nums[++i]);
+                    while(i < j && nums[j] == nums[--j]);
+                }
+            }
+        }
+        return res;
+    }
+}
+
+python方法：
+class Solution:
+    def threeSum(self, nums: [int]) -> [[int]]:
+        nums.sort()
+        res, k = [], 0
+        for k in range(len(nums) - 2):
+            if nums[k] > 0: break # 1. because of j > i > k.
+            if k > 0 and nums[k] == nums[k - 1]: continue # 2. skip the same `nums[k]`.
+            i, j = k + 1, len(nums) - 1
+            while i < j: # 3. double pointer
+                s = nums[k] + nums[i] + nums[j]
+                if s < 0:
+                    i += 1
+                    while i < j and nums[i] == nums[i - 1]: i += 1
+                elif s > 0:
+                    j -= 1
+                    while i < j and nums[j] == nums[j + 1]: j -= 1
+                else:
+                    res.append([nums[k], nums[i], nums[j]])
+                    i += 1
+                    j -= 1
+                    while i < j and nums[i] == nums[i - 1]: i += 1
+                    while i < j and nums[j] == nums[j + 1]: j -= 1
+        return res
