@@ -1,0 +1,136 @@
+题目：
+Table: Activity
+
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| player_id    | int     |
+| device_id    | int     |
+| event_date   | date    |
+| games_played | int     |
++--------------+---------+
+(player_id, event_date) is the primary key of this table.
+This table shows the activity of players of some game.
+Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on some day using some device.
+ 
+
+Write an SQL query that reports for each player and date, how many games played so far by the player. That is, the total number of games played by the player until that date. Check the example for clarity.
+
+The query result format is in the following example:
+
+Activity table:
++-----------+-----------+------------+--------------+
+| player_id | device_id | event_date | games_played |
++-----------+-----------+------------+--------------+
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-05-02 | 6            |
+| 1         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
++-----------+-----------+------------+--------------+
+
+Result table:
++-----------+------------+---------------------+
+| player_id | event_date | games_played_so_far |
++-----------+------------+---------------------+
+| 1         | 2016-03-01 | 5                   |
+| 1         | 2016-05-02 | 11                  |
+| 1         | 2017-06-25 | 12                  |
+| 3         | 2016-03-02 | 0                   |
+| 3         | 2018-07-03 | 5                   |
++-----------+------------+---------------------+
+For the player with id 1, 5 + 6 = 11 games played by 2016-05-02, and 5 + 6 + 1 = 12 games played by 2017-06-25.
+For the player with id 3, 0 + 5 = 5 games played by 2018-07-03.
+Note that for each player we only care about the days when the player logged in.
+
+############################################################
+思路:
+第一步：分析本题，让求出每位玩家截止到每次登录平台时加上之前的一共玩了多少游戏，最后一句话特别提醒了要忽略玩家使用的设备，比如玩家1在截止到2016-05-02登录平台时一共玩了5+6，一共是11个游戏；
+第二步：首先最简单的思路，可以让Activity进行自连接，条件是其中一个A的日期小于等于另一个B的日期，然后按照B的玩家和日期group by，这样展示出来的笛卡尔积就是B中的全部分组后的数据，同时每一项后面都会有A的小于等于B日期的所有数据，这样我们只需要求sum(A.games_played)就是当前日期玩过的游戏数量，其实这也是这类累加和或前缀和问题的通用解法；
+第三步：另一种方法我们可以使用累加操作，由于mysql没有提供相应的函数，因此我们可以使用自定义用户变量来解决，声明三个遍历，分别记录上一行的player_id，上一行的event_date，每个人games_played和；然后根据逻辑关联Activity表，根据判断逻辑，累加结果，最终外面套一层循环输出想要的结果即可
+
+############################################################
+结论：
+第一种方法：然后连接条件里假如是A.player_id = B.player_id AND A.event_date <= B.event_date，那么这里就要以B.player_id,B.event_date分组，同时前面select语句查询的也是B.player_id,B.event_date，不过需要注意的是sum要求A.games_played既可以得出结果
+1、首先将Activity表进行自连接，假如连接条件A.player_id = B.player_id AND A.event_date <= B.event_date，并根据B.player_id,B.event_date分组：
+	select * from Activity A join Activity B 
+	on A.player_id = B.player_id and A.event_date <=B.event_date group by B.player_id,B.event_date
+2、此时每一项B数据的event_date后面都会对应所有的该日期前的A表数据，因此如果要求截止该日期玩家玩的游戏数量，只需要sum(A.games_played)即可：
+	select B.player_id,B.event_date,sum(A.games_played ) as games_played_so_far from Activity A join Activity B 
+	on A.player_id = B.player_id and A.event_date <=B.event_date group by B.player_id,B.event_date
+	
+第二种方法：
+1、定义3个用户遍历pre_id存储上一行的player_id，pre_date存储上一行的event_date，sum_cnt存储每个人games_played的和：
+	(SELECT @pre_id:=NULL,@pre_date:=NULL,@sum_cnt:=0) AS B
+2、计算逻辑是，当遍历到的player_id和pre_id相等，同时event_date和pre_date不相等时将games_played+sum_cnt值赋值给sum_cnt：
+	@sum_cnt:= IF(A.player_id = @pre_id AND A.event_date != @pre_date,
+			@sum_cnt + A.games_played,
+			A.games_played 
+		) AS `games_played_so_far`,
+	@pre_id:=A.player_id,
+	@pre_date:=A.event_date
+2、由于输出的结果不需要展示pre_id和pre_date，因此外层套用一个查询，查出player_id，event_date， games_played_so_far 即可：
+	SELECT C.player_id,C.event_date,C.games_played_so_far
+	FROM (
+	SELECT 
+		A.player_id,
+		A.event_date,
+	@sum_cnt:=
+			if(A.player_id = @pre_id AND A.event_date != @pre_date,
+				@sum_cnt + A.games_played,
+				A.games_played 
+			)
+			AS `games_played_so_far`,
+	@pre_id:=A.player_id,
+	@pre_date:=A.event_date
+
+	FROM 
+	activity AS A,(SELECT @pre_id:=NULL,@pre_date:=NULL,@sum_cnt:=0) AS B
+	order BY A.player_id,A.event_date
+	) AS C
+
+############################################################
+
+方法1：
+	SELECT
+		B.player_id,
+		B.event_date,
+		sum(A.games_played) AS games_played_so_far
+	FROM
+		Activity A
+	JOIN Activity B ON A.player_id = B.player_id
+	AND A.event_date <= B.event_date
+	GROUP BY
+		B.player_id,
+		B.event_date
+方法2：
+	SELECT
+		C.player_id,
+		C.event_date,
+		C.games_played_so_far
+	FROM
+		(
+			SELECT
+				A.player_id,
+				A.event_date,
+				@sum_cnt :=
+			IF (
+				A.player_id = @pre_id
+				AND A.event_date != @pre_date,
+				@sum_cnt + A.games_played,
+				A.games_played
+			) AS `games_played_so_far`,
+			@pre_id := A.player_id,
+			@pre_date := A.event_date
+		FROM
+			activity AS A,
+			(
+				SELECT
+					@pre_id := NULL ,@pre_date := NULL ,@sum_cnt := 0
+			) AS B
+		ORDER BY
+			A.player_id,
+			A.event_date
+		) AS C
+			
+
