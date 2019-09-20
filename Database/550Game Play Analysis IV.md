@@ -96,11 +96,11 @@ Only the player with id 1 logged back in after the first day he had logged in so
 
 ***
 
-## sql
+## SQL
 
-    ```sql
-    select round(sum(case when datediff(a.event_date,b.first_date)=1 then 1 else 0 end)/(select count(distinct(player_id)) from activity),2) as fraction
-    from activity a,
-    (select player_id,min(event_date) first_date from activity group by player_id) b
-    where a.player_id=b.player_id
-    ```
+```sql
+select round(sum(case when datediff(a.event_date,b.first_date)=1 then 1 else 0 end)/(select count(distinct(player_id)) from activity),2) as fraction
+from activity a,
+(select player_id,min(event_date) first_date from activity group by player_id) b
+where a.player_id=b.player_id
+```
