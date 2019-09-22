@@ -13,4 +13,4 @@
 ## 进度
 
 - 569 员工薪水中位数
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/569员工薪水中位数.md  "点击进入")
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/569员工薪水中位数.md   "点击进入")
