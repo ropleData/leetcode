@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 550 Game Play Analysis IV
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/550Game%20Play%20Analysis%20IV.md  "点击进入")
+- 569 员工薪水中位数
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/569员工薪水中位数.md  "点击进入")
