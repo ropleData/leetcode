@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 017 电话号码的字母组合
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/017电话号码的字母组合.md    "点击进入")
+- 018 四数之和
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/018四数之和.md  "点击进入")
