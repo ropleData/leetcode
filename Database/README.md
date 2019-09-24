@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 570 至少有5名直接下属的经理
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/570%E8%87%B3%E5%B0%91%E6%9C%895%E5%90%8D%E7%9B%B4%E6%8E%A5%E4%B8%8B%E5%B1%9E%E7%9A%84%E7%BB%8F%E7%90%86.md   "点击进入")
+- 571 给定数字的频率查询中位数
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/571%E7%BB%99%E5%AE%9A%E6%95%B0%E5%AD%97%E7%9A%84%E9%A2%91%E7%8E%87%E6%9F%A5%E8%AF%A2%E4%B8%AD%E4%BD%8D%E6%95%B0.md   "点击进入")
