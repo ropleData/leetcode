@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 019 删除链表的倒数第N个节点
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/019%E5%88%A0%E9%99%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%80%92%E6%95%B0%E7%AC%ACN%E4%B8%AA%E8%8A%82%E7%82%B9.md  "点击进入")
+- 020 有效的括号
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/020%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7.md  "点击进入")
