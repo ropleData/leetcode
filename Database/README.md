@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 571 给定数字的频率查询中位数
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/571%E7%BB%99%E5%AE%9A%E6%95%B0%E5%AD%97%E7%9A%84%E9%A2%91%E7%8E%87%E6%9F%A5%E8%AF%A2%E4%B8%AD%E4%BD%8D%E6%95%B0.md    "点击进入")
+- 574 当选者
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/574%E5%BD%93%E9%80%89%E8%80%85.md    "点击进入")
