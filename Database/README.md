@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 574 当选者
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/574%E5%BD%93%E9%80%89%E8%80%85.md  "点击进入")
+- 577 员工奖金
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Database/577%E5%91%98%E5%B7%A5%E5%A5%96%E9%87%91.md  "点击进入")
