@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 022 括号生成
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/022%E6%8B%AC%E5%8F%B7%E7%94%9F%E6%88%90.md   "点击进入")
+- 023 合并K个排序链表
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/023%E5%90%88%E5%B9%B6K%E4%B8%AA%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8.md   "点击进入")
