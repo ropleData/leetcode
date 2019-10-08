@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 023 合并K个排序链表
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/023%E5%90%88%E5%B9%B6K%E4%B8%AA%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8.md   "点击进入")
+- 024 两两交换链表中的节点
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/024%E4%B8%A4%E4%B8%A4%E4%BA%A4%E6%8D%A2%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9.md   "点击进入")
