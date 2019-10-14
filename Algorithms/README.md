@@ -12,5 +12,5 @@
 
 ## 进度
 
-- 027 移除元素
-- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/027%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0.md   "点击进入")
+- 028 实现 strStr()
+- [最近更新题目](https://github.com/ropleData/leetcode/blob/master/Algorithms/028%E5%AE%9E%E7%8E%B0strStr().md   "点击进入")
