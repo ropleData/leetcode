@@ -41,7 +41,7 @@
 ############################################################
 sql：
 解法一：
-SELECT *
+SELECT DISTINCT l1.Num AS ConsecutiveNums 
 FROM
     Logs l1,
     Logs l2,
